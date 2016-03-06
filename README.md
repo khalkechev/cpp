@@ -1,5 +1,5 @@
-# Курс по C++
+# C++ course
 
-Лекторы: Кирилл Лунев, Роман Халкечев
+Authors: Kirill Lunev, Roman Khalkechev
 
-Контакты:  kirilllunev@gmail.com, khalkechev@gmail.com
+Contacts:  kirilllunev@gmail.com, khalkechev@gmail.com
