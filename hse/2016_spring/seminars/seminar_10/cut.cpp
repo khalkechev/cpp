@@ -40,9 +40,14 @@ void Split2(const std::string& line,
 
 int main(int argc, char const *argv[]) {
 
-    int columnNumber = 1;
-    char delimiter = ',';
-    std::string fileName = "example.csv";
+    if (argc < 4) {
+        std::cout << "Args: [column number] [deimiter] [filename]\n";
+        return 1;
+    }
+
+    int columnNumber = atoi(argv[1]);
+    char delimiter = argv[2][0];
+    std::string fileName = argv[3];
 
     std::ifstream inputFile(fileName);
     std::string line;
