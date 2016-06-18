@@ -31,7 +31,10 @@ static void GetFiles(const char* path, std::vector<std::string>* files) {
         struct dirent *entry = readdir(directory);
         while (entry) {
             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-                files->push_back(entry->d_name);
+                std::string fileName = path;
+                fileName += "/";
+                fileName += entry->d_name;
+                files->push_back(fileName);
             }
             entry = readdir(directory);
         }
@@ -41,17 +44,17 @@ static void GetFiles(const char* path, std::vector<std::string>* files) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void ReadFile(const std::string fileName,
-                     int fileNumber,
-                     std::map<std::string, std::set<int>>* invertedIndex)
+static void ReadDocument(const std::string documentName,
+                         int docNumber,
+                         std::map<std::string, std::set<int>>* invertedIndex)
 {
-    std::ifstream file(fileName);
+    std::ifstream document(documentName);
     std::string line;
-    while (std::getline(file, line)) {
+    while (std::getline(document, line)) {
         std::vector<std::string> words;
         Split(line, ' ', &words);
         for (const auto& word : words) {
-            (*invertedIndex)[word].insert(fileNumber);
+            (*invertedIndex)[word].insert(docNumber);
         }
     }
 }
@@ -71,15 +74,25 @@ static void SaveInvertedIndex(const std::map<std::string, std::set<int>>& invert
     }
 }
 
+static void SaveDocumentsNames(const std::vector<std::string>& documents,
+                               const std::string& fileName)
+{
+    std::ofstream file(fileName);
+    for (const auto& documentName : documents) {
+        file << documentName << '\n';
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void BuildInvertedIndex(const char* path, const std::string& outPrefix) {
-    std::vector<std::string> files;
-    GetFiles(path, &files);
+    std::vector<std::string> documents;
+    GetFiles(path, &documents);
     std::map<std::string, std::set<int>> invertedIndex;
-    for (size_t fileNumber = 0; fileNumber < files.size(); ++fileNumber) {
-        ReadFile(files[fileNumber], fileNumber, &invertedIndex);
+    for (size_t docNumber = 0; docNumber < documents.size(); ++docNumber) {
+        ReadDocument(documents[docNumber], docNumber, &invertedIndex);
     }
+    SaveDocumentsNames(documents, outPrefix + ".files");
     SaveInvertedIndex(invertedIndex, outPrefix + ".index");
 }
 
