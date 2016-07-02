@@ -1,10 +1,11 @@
+#include <ctime>
+#include <dirent.h>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
-#include <dirent.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +26,8 @@ static void Split(const std::string& line,
     fields->push_back(word);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 static void GetFiles(const char* path, std::vector<std::string>* files) {
     DIR* directory = opendir(path);
     if (directory != nullptr) {
@@ -42,8 +45,6 @@ static void GetFiles(const char* path, std::vector<std::string>* files) {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 static void ReadDocument(const std::string documentName,
                          int docNumber,
                          std::map<std::string, std::set<int>>* invertedIndex)
@@ -56,6 +57,17 @@ static void ReadDocument(const std::string documentName,
         for (const auto& word : words) {
             (*invertedIndex)[word].insert(docNumber);
         }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+static void SaveDocumentsNames(const std::vector<std::string>& documents,
+                               const std::string& fileName)
+{
+    std::ofstream file(fileName);
+    for (const auto& documentName : documents) {
+        file << documentName << '\n';
     }
 }
 
@@ -74,15 +86,6 @@ static void SaveInvertedIndex(const std::map<std::string, std::set<int>>& invert
     }
 }
 
-static void SaveDocumentsNames(const std::vector<std::string>& documents,
-                               const std::string& fileName)
-{
-    std::ofstream file(fileName);
-    for (const auto& documentName : documents) {
-        file << documentName << '\n';
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void BuildInvertedIndex(const char* path, const std::string& outPrefix) {
@@ -98,8 +101,23 @@ static void BuildInvertedIndex(const char* path, const std::string& outPrefix) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+static void PrintUsageAndExit(int argc, char const *argv[]) {
+    std::cerr << "Usage: " << argv[0] << " path_to_documents" << " out_prefix\n";
+    std::cerr << "path_to_documents: path to directory with documents\n";
+    std::cerr << "out_prefix: prefix for output files\n";
+    exit(1);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char const *argv[]) {
-    BuildInvertedIndex("documents", "out");
+    if (argc < 3) {
+        PrintUsageAndExit(argc, argv);
+    }
+    clock_t startTime = clock();
+    BuildInvertedIndex(argv[1], argv[2]);
+    clock_t workTime = clock() - startTime;
+    std::cerr << "Done in " << static_cast<double>(workTime) / CLOCKS_PER_SEC << "seconds\n";
     return 0;
 }
 
