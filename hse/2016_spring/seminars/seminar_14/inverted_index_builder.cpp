@@ -117,7 +117,7 @@ int main(int argc, char const *argv[]) {
     clock_t startTime = clock();
     BuildInvertedIndex(argv[1], argv[2]);
     clock_t workTime = clock() - startTime;
-    std::cerr << "Done in " << static_cast<double>(workTime) / CLOCKS_PER_SEC << "seconds\n";
+    std::cerr << "Done in " << static_cast<double>(workTime) / CLOCKS_PER_SEC << " seconds\n";
     return 0;
 }
 
